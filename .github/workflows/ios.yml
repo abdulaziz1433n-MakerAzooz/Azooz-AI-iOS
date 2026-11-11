@@ -1,0 +1,34 @@
+name: Build Azooz AI iOS
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build iOS Simulator app
+        run: |
+          xcodebuild \
+            -project AzoozAI.xcodeproj \
+            -scheme AzoozAI \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Upload simulator app
+        uses: actions/upload-artifact@v4
+        with:
+          name: AzoozAI-iOS-Simulator
+          path: build/DerivedData/Build/Products/Debug-iphonesimulator/AzoozAI.app
+          if-no-files-found: error
